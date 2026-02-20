@@ -28,42 +28,80 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-body {
+
+/* App background */
+.stApp {
     background-color: #0f172a;
-    color: #e2e8f0;
 }
-.block-container {
-    padding-top: 2rem;
+
+/* Force all text to light color */
+html, body, [class*="css"]  {
+    color: #f1f5f9 !important;
 }
+
+/* Headings */
 h1 {
-    color: #ef4444;
+    color: #ef4444 !important;
     font-weight: 800;
 }
+
 h2, h3 {
-    color: #f87171;
+    color: #f87171 !important;
 }
+
+/* Buttons */
 .stButton>button {
     background: linear-gradient(90deg, #ef4444, #dc2626);
-    color: white;
+    color: white !important;
     font-weight: 600;
     border-radius: 8px;
     height: 3em;
     width: 100%;
 }
+
+/* Result cards */
 .result-card {
     background-color: #1e293b;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 15px;
     border: 1px solid #334155;
+    color: #ffffff !important;
 }
+
+/* Metric box */
 .metric-box {
     background-color: #1e293b;
     padding: 15px;
     border-radius: 10px;
     border: 1px solid #334155;
     text-align: center;
+    color: #ffffff !important;
 }
+
+/* Percentage styling */
+.metric-box h2 {
+    color: #ffffff !important;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Fix markdown text */
+.stMarkdown, .stText {
+    color: #f1f5f9 !important;
+}
+
+/* Mobile improvements */
+@media (max-width: 768px) {
+    .metric-box h2 {
+        font-size: 1.8rem;
+    }
+    .result-card p {
+        font-size: 1rem;
+        color: #ffffff !important;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
