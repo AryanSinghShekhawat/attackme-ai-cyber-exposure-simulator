@@ -4,12 +4,18 @@ from attack_engine import generate_attack_profile
 import pandas as pd
 import matplotlib.pyplot as plt
 from report_generator import generate_pdf_report
+
+# =============================
+# SESSION STATE INIT
+# =============================
+
 if "risk_history" not in st.session_state:
     st.session_state.risk_history = []
 
 # =============================
 # PAGE CONFIG
 # =============================
+
 st.set_page_config(
     page_title="AttackMe | AI Cyber Exposure Simulator",
     page_icon="🛡️",
@@ -17,8 +23,9 @@ st.set_page_config(
 )
 
 # =============================
-# PROFESSIONAL DARK THEME
+# DARK THEME
 # =============================
+
 st.markdown("""
 <style>
 body {
@@ -63,6 +70,7 @@ h2, h3 {
 # =============================
 # HEADER
 # =============================
+
 st.title("🛡️ AttackMe – AI Cyber Exposure Simulator")
 st.markdown("""
 **Enterprise-grade behavioral threat modeling simulation.**  
@@ -74,6 +82,7 @@ st.divider()
 # =============================
 # INPUT SECTION
 # =============================
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -88,7 +97,7 @@ with col2:
     cracked_software = st.selectbox("Installation of Unverified/Cracked Software", ["Yes", "No"])
 
 # =============================
-# SCORING ENGINE (Structured & Normalized)
+# SCORING ENGINE
 # =============================
 
 risk_weights = {
@@ -127,12 +136,11 @@ if share_info == "Yes":
 if cracked_software == "Yes":
     score += risk_weights["cracked_software"]
 
-# Normalize score to 0–100 scale
 MAX_POSSIBLE_SCORE = sum(risk_weights.values())
 normalized_score = round((score / MAX_POSSIBLE_SCORE) * 100)
-st.session_state.risk_history.append(normalized_score)
+
 # =============================
-# Attack Probability Graph
+# ATTACK PROBABILITY GRAPH
 # =============================
 
 st.markdown("## 📈 Attack Vector Probability Model")
@@ -145,43 +153,17 @@ attack_vectors = {
     "Social Engineering": normalized_score * 0.85
 }
 
-# =============================
-# MITRE ATT&CK Mapping
-# =============================
-
-MITRE_MAPPING = {
-    "Phishing": "T1566 – Phishing",
-    "Credential Stuffing": "T1110 – Brute Force",
-    "Malware Injection": "T1204 – User Execution",
-    "Session Hijacking": "T1539 – Steal Web Session Cookie",
-    "Social Engineering": "T1598 – Phishing for Information"
-}
-
-st.markdown("## 🧠 MITRE ATT&CK Mapping")
-
-for vector in attack_vectors.keys():
-    st.markdown(f"- **{vector}** → {MITRE_MAPPING.get(vector)}")
-
 df = pd.DataFrame({
-    "Attack Vector": attack_vectors.keys(),
-    "Probability (%)": attack_vectors.values()
+    "Attack Vector": list(attack_vectors.keys()),
+    "Probability (%)": list(attack_vectors.values())
 })
 
 fig, ax = plt.subplots()
-ax.bar(df["Attack Vector"], df["Probability (%)"])
-ax.set_ylabel("Probability (%)")
+ax.bar(range(len(df)), df["Probability (%)"])
+ax.set_xticks(range(len(df)))
 ax.set_xticklabels(df["Attack Vector"], rotation=45)
-
+ax.set_ylabel("Probability (%)")
 st.pyplot(fig)
-
-st.markdown("## 📊 Risk Trend Over Time")
-
-trend_df = pd.DataFrame({
-    "Assessment #": range(1, len(st.session_state.risk_history)+1),
-    "Risk Score": st.session_state.risk_history
-})
-
-st.line_chart(trend_df.set_index("Assessment #"))
 
 # =============================
 # RISK DASHBOARD
@@ -202,7 +184,6 @@ with colB:
     </div>
     """, unsafe_allow_html=True)
 
-# Risk Category Logic
 if normalized_score >= 75:
     st.error("CRITICAL RISK – High probability of targeted compromise")
 elif normalized_score >= 50:
@@ -218,6 +199,9 @@ st.divider()
 
 if st.button("⚡ Run Threat Simulation"):
 
+    # Save risk history only when simulation runs
+    st.session_state.risk_history.append(normalized_score)
+
     summary = f"""
     Password reuse: {reuse_passwords}
     Public social exposure: {public_social}
@@ -231,13 +215,25 @@ if st.button("⚡ Run Threat Simulation"):
     with st.spinner("Executing AI behavioral threat modeling..."):
         try:
             result = generate_attack_profile(summary)
+
+            if not result:
+                raise ValueError("Empty AI response")
+
             data = json.loads(result)
 
+        except json.JSONDecodeError:
+            st.error("AI returned invalid JSON format.")
+            st.stop()
+
         except Exception as e:
-            st.error("Simulation failed. Please verify backend configuration.")
+            st.error(f"Simulation failed: {str(e)}")
             st.stop()
 
     st.success("Threat Simulation Complete")
+
+    # =============================
+    # DISPLAY RESULTS
+    # =============================
 
     st.markdown("## 🎯 Predicted Compromise Pathway")
 
@@ -256,12 +252,13 @@ if st.button("⚡ Run Threat Simulation"):
     card("Impact Assessment", data.get("impact", "N/A"))
 
     # =============================
-    # RISK LEVEL FROM AI
+    # AI RISK CLASSIFICATION
     # =============================
 
     st.markdown("## 🚨 AI Risk Classification")
 
     risk = data.get("risk_level", "medium").lower()
+
     if risk == "high":
         st.error("AI Classification: HIGH RISK")
     elif risk == "medium":
@@ -275,26 +272,41 @@ if st.button("⚡ Run Threat Simulation"):
 
     st.markdown("## 🛡 Recommended Security Controls")
 
-    for action in data.get("mitigation_actions", []):
+    mitigations = data.get("mitigation_actions") or []
+
+    if not isinstance(mitigations, list):
+        mitigations = []
+
+    for action in mitigations:
         st.markdown(f"- {action}")
 
-    # Generate PDF ONLY ONCE
-    pdf_file = generate_pdf_report(normalized_score, data)
+    # =============================
+    # PDF DOWNLOAD (SAFE)
+    # =============================
 
-    with open(pdf_file, "rb") as file:
-        st.download_button(
-            label="📄 Download Full Security Report",
-            data=file,
-            file_name="AttackMe_Report.pdf",
-            mime="application/pdf",
-            key="download_report_button"
-        )
+    try:
+        pdf_file = generate_pdf_report(normalized_score, data)
+
+        if pdf_file:
+            with open(pdf_file, "rb") as file:
+                st.download_button(
+                    label="📄 Download Full Security Report",
+                    data=file,
+                    file_name="AttackMe_Report.pdf",
+                    mime="application/pdf",
+                    key="download_report_button"
+                )
+        else:
+            st.error("PDF generation failed.")
+
+    except Exception:
+        st.error("Report generation failed.")
 
     st.divider()
 
     st.markdown("""
     ### Executive Insight
     Traditional security advice is generic.
-    AttackMe performs behavioral threat modeling to simulate **realistic adversarial pathways**.
+    AttackMe performs behavioral threat modeling to simulate realistic adversarial pathways.
     Security begins with understanding your most probable breach vector.
     """)
