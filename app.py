@@ -284,8 +284,9 @@ if st.button("⚡ Run Threat Simulation"):
                 label="📄 Download Full Security Report",
                 data=file,
                 file_name="AttackMe_Report.pdf",
-                mime="application/pdf"
-    )
+                mime="application/pdf",
+                key="download_report_button"
+)
 
     st.divider()
 
