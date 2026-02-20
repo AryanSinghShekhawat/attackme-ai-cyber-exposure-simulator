@@ -140,43 +140,48 @@ MAX_POSSIBLE_SCORE = sum(risk_weights.values())
 normalized_score = round((score / MAX_POSSIBLE_SCORE) * 100)
 
 # =============================
+# RESPONSIVE LAYOUT SECTION
+# =============================
+
+col_left, col_right = st.columns([3, 2])
+
+# =============================
 # ATTACK PROBABILITY GRAPH
 # =============================
 
-st.markdown("## 📈 Attack Vector Probability Model")
+with col_left:
+    st.markdown("## 📈 Attack Vector Probability Model")
 
-attack_vectors = {
-    "Phishing": normalized_score * 0.9,
-    "Credential Stuffing": normalized_score * 0.8,
-    "Malware Injection": normalized_score * 0.7,
-    "Session Hijacking": normalized_score * 0.6,
-    "Social Engineering": normalized_score * 0.85
-}
+    attack_vectors = {
+        "Phishing": normalized_score * 0.9,
+        "Credential Stuffing": normalized_score * 0.8,
+        "Malware Injection": normalized_score * 0.7,
+        "Session Hijacking": normalized_score * 0.6,
+        "Social Engineering": normalized_score * 0.85
+    }
 
-df = pd.DataFrame({
-    "Attack Vector": list(attack_vectors.keys()),
-    "Probability (%)": list(attack_vectors.values())
-})
+    df = pd.DataFrame({
+        "Attack Vector": list(attack_vectors.keys()),
+        "Probability (%)": list(attack_vectors.values())
+    })
 
-fig, ax = plt.subplots()
-ax.bar(range(len(df)), df["Probability (%)"])
-ax.set_xticks(range(len(df)))
-ax.set_xticklabels(df["Attack Vector"], rotation=45)
-ax.set_ylabel("Probability (%)")
-st.pyplot(fig)
+    fig, ax = plt.subplots()
+    ax.bar(range(len(df)), df["Probability (%)"])
+    ax.set_xticks(range(len(df)))
+    ax.set_xticklabels(df["Attack Vector"], rotation=45)
+    ax.set_ylabel("Probability (%)")
+
+    st.pyplot(fig, use_container_width=True)
 
 # =============================
-# RISK DASHBOARD
+# RISK DASHBOARD (RIGHT SIDE)
 # =============================
 
-st.markdown("## 📊 Behavioral Exposure Score")
+with col_right:
+    st.markdown("## 📊 Behavioral Exposure Score")
 
-colA, colB = st.columns([2, 1])
-
-with colA:
     st.progress(normalized_score)
 
-with colB:
     st.markdown(f"""
     <div class="metric-box">
     <h2>{normalized_score}%</h2>
@@ -184,12 +189,12 @@ with colB:
     </div>
     """, unsafe_allow_html=True)
 
-if normalized_score >= 75:
-    st.error("CRITICAL RISK – High probability of targeted compromise")
-elif normalized_score >= 50:
-    st.warning("ELEVATED RISK – Multiple exploitable vectors detected")
-else:
-    st.success("MODERATE / LOW RISK – Limited attack surface exposure")
+    if normalized_score >= 75:
+        st.error("CRITICAL RISK – High probability of targeted compromise")
+    elif normalized_score >= 50:
+        st.warning("ELEVATED RISK – Multiple exploitable vectors detected")
+    else:
+        st.success("MODERATE / LOW RISK – Limited attack surface exposure")
 
 st.divider()
 
@@ -199,7 +204,6 @@ st.divider()
 
 if st.button("⚡ Run Threat Simulation"):
 
-    # Save risk history only when simulation runs
     st.session_state.risk_history.append(normalized_score)
 
     summary = f"""
@@ -231,10 +235,6 @@ if st.button("⚡ Run Threat Simulation"):
 
     st.success("Threat Simulation Complete")
 
-    # =============================
-    # DISPLAY RESULTS
-    # =============================
-
     st.markdown("## 🎯 Predicted Compromise Pathway")
 
     def card(title, content):
@@ -251,10 +251,6 @@ if st.button("⚡ Run Threat Simulation"):
     card("Privilege Escalation Path", data.get("privilege_escalation", "N/A"))
     card("Impact Assessment", data.get("impact", "N/A"))
 
-    # =============================
-    # AI RISK CLASSIFICATION
-    # =============================
-
     st.markdown("## 🚨 AI Risk Classification")
 
     risk = data.get("risk_level", "medium").lower()
@@ -266,10 +262,6 @@ if st.button("⚡ Run Threat Simulation"):
     else:
         st.success("AI Classification: LOW RISK")
 
-    # =============================
-    # MITIGATION
-    # =============================
-
     st.markdown("## 🛡 Recommended Security Controls")
 
     mitigations = data.get("mitigation_actions") or []
@@ -279,10 +271,6 @@ if st.button("⚡ Run Threat Simulation"):
 
     for action in mitigations:
         st.markdown(f"- {action}")
-
-    # =============================
-    # PDF DOWNLOAD (SAFE)
-    # =============================
 
     try:
         pdf_file = generate_pdf_report(normalized_score, data)
