@@ -293,27 +293,23 @@ if st.button("⚡ Run Threat Simulation"):
         st.info("No mitigation data returned from AI.")
 
 # =============================
-# RISK TREND GRAPH (ALWAYS VISIBLE)
-# =============================
+    # RISK TREND CHART
+    # =============================
 
-st.markdown("## 📊 Risk Trend Over Time")
+    st.markdown("## 📊 Risk Trend Over Time")
 
-if st.session_state.risk_history:
     trend_df = pd.DataFrame({
-        "Run": list(range(1, len(st.session_state.risk_history)+1)),
+        "Simulation": list(range(1, len(st.session_state.risk_history)+1)),
         "Risk Score": st.session_state.risk_history
     })
 
     fig2, ax2 = plt.subplots(figsize=(6,4))
-    ax2.plot(trend_df["Run"], trend_df["Risk Score"])
-    ax2.set_ylim(0,100)
+    ax2.plot(trend_df["Simulation"], trend_df["Risk Score"])
     ax2.set_xlabel("Simulation Run")
     ax2.set_ylabel("Risk Score (%)")
     plt.tight_layout()
 
-    st.pyplot(fig2)
-else:
-    st.info("Run simulation to start tracking risk trend.")
+    st.pyplot(fig2, use_container_width=False)
 
     # =============================
     # PDF REPORT
