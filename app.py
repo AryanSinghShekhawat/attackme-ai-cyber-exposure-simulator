@@ -39,7 +39,7 @@ st.markdown("""
 }
 
 /* BIG Responsive Button */
-div.stButton > button {
+.center-button-container button {
     width: 80%;
     max-width: 600px;
     height: 80px;
