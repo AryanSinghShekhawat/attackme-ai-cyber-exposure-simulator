@@ -1,6 +1,11 @@
 import streamlit as st
 import json
 from attack_engine import generate_attack_profile
+import pandas as pd
+import matplotlib.pyplot as plt
+from report_generator import generate_pdf_report
+if "risk_history" not in st.session_state:
+    st.session_state.risk_history = []
 
 # =============================
 # PAGE CONFIG
@@ -125,6 +130,58 @@ if cracked_software == "Yes":
 # Normalize score to 0–100 scale
 MAX_POSSIBLE_SCORE = sum(risk_weights.values())
 normalized_score = round((score / MAX_POSSIBLE_SCORE) * 100)
+st.session_state.risk_history.append(normalized_score)
+# =============================
+# Attack Probability Graph
+# =============================
+
+st.markdown("## 📈 Attack Vector Probability Model")
+
+attack_vectors = {
+    "Phishing": normalized_score * 0.9,
+    "Credential Stuffing": normalized_score * 0.8,
+    "Malware Injection": normalized_score * 0.7,
+    "Session Hijacking": normalized_score * 0.6,
+    "Social Engineering": normalized_score * 0.85
+}
+
+# =============================
+# MITRE ATT&CK Mapping
+# =============================
+
+MITRE_MAPPING = {
+    "Phishing": "T1566 – Phishing",
+    "Credential Stuffing": "T1110 – Brute Force",
+    "Malware Injection": "T1204 – User Execution",
+    "Session Hijacking": "T1539 – Steal Web Session Cookie",
+    "Social Engineering": "T1598 – Phishing for Information"
+}
+
+st.markdown("## 🧠 MITRE ATT&CK Mapping")
+
+for vector in attack_vectors.keys():
+    st.markdown(f"- **{vector}** → {MITRE_MAPPING.get(vector)}")
+
+df = pd.DataFrame({
+    "Attack Vector": attack_vectors.keys(),
+    "Probability (%)": attack_vectors.values()
+})
+
+fig, ax = plt.subplots()
+ax.bar(df["Attack Vector"], df["Probability (%)"])
+ax.set_ylabel("Probability (%)")
+ax.set_xticklabels(df["Attack Vector"], rotation=45)
+
+st.pyplot(fig)
+
+st.markdown("## 📊 Risk Trend Over Time")
+
+trend_df = pd.DataFrame({
+    "Assessment #": range(1, len(st.session_state.risk_history)+1),
+    "Risk Score": st.session_state.risk_history
+})
+
+st.line_chart(trend_df.set_index("Assessment #"))
 
 # =============================
 # RISK DASHBOARD
@@ -221,6 +278,16 @@ if st.button("⚡ Run Threat Simulation"):
 
     for action in data.get("mitigation_actions", []):
         st.markdown(f"- {action}")
+        # Generate PDF
+pdf_file = generate_pdf_report(normalized_score, data)
+
+with open(pdf_file, "rb") as file:
+    st.download_button(
+        label="📄 Download Full Security Report",
+        data=file,
+        file_name="AttackMe_Report.pdf",
+        mime="application/pdf"
+    )
 
     st.divider()
 
