@@ -208,12 +208,15 @@ with col_left:
         "Probability (%)": list(attack_vectors.values())
     })
 
-    fig, ax = plt.subplots()
-    ax.bar(range(len(df)), df["Probability (%)"])
-    ax.set_xticks(range(len(df)))
-    ax.set_xticklabels(df["Attack Vector"], rotation=45)
+    fig, ax = plt.subplots(figsize=(6,4))   # 🔥 Smaller size
+
+    ax.bar(df["Attack Vector"], df["Probability (%)"])
     ax.set_ylabel("Probability (%)")
-    st.pyplot(fig, use_container_width=True)
+    ax.set_xticklabels(df["Attack Vector"], rotation=30)
+
+    plt.tight_layout()
+
+    st.pyplot(fig, use_container_width=False)   # 🔥 Prevent full screen
 
 with col_right:
     st.markdown("## 📊 Exposure Dashboard")
