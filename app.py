@@ -23,85 +23,70 @@ st.set_page_config(
 )
 
 # =============================
-# DARK THEME
+# SERIES A ENTERPRISE UI
 # =============================
 
 st.markdown("""
 <style>
-
-/* App background */
 .stApp {
-    background-color: #0f172a;
+    background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+    color: #e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Force all text to light color */
-html, body, [class*="css"]  {
-    color: #f1f5f9 !important;
-}
+h1 { color: #f87171; font-weight:700; }
+h2 { color: #e5e7eb; font-weight:600; }
 
-/* Headings */
-h1 {
-    color: #ef4444 !important;
-    font-weight: 800;
-}
-
-h2, h3 {
-    color: #f87171 !important;
-}
-
-/* Buttons */
-.stButton>button {
-    background: linear-gradient(90deg, #ef4444, #dc2626);
-    color: white !important;
-    font-weight: 600;
-    border-radius: 8px;
-    height: 3em;
-    width: 100%;
-}
-
-/* Result cards */
 .result-card {
-    background-color: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #334155;
-    color: #ffffff !important;
+    background:#111827;
+    padding:20px;
+    border-radius:14px;
+    margin-bottom:15px;
+    border:1px solid #1f2937;
+    transition:0.3s ease;
+}
+.result-card:hover {
+    transform:translateY(-4px);
+    border-color:#374151;
 }
 
-/* Metric box */
+.exec-box {
+    background:linear-gradient(135deg,#111827,#1f2937);
+    padding:25px;
+    border-radius:16px;
+    border:1px solid #1f2937;
+    margin-bottom:25px;
+}
+
+.badge {
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:0.8rem;
+    font-weight:600;
+}
+.badge-low { background:rgba(34,197,94,0.15); color:#22c55e; }
+.badge-medium { background:rgba(234,179,8,0.15); color:#eab308; }
+.badge-high { background:rgba(239,68,68,0.15); color:#ef4444; }
+
 .metric-box {
-    background-color: #1e293b;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #334155;
-    text-align: center;
-    color: #ffffff !important;
+    background:#111827;
+    padding:20px;
+    border-radius:14px;
+    border:1px solid #1f2937;
+    text-align:center;
 }
 
-/* Percentage styling */
-.metric-box h2 {
-    color: #ffffff !important;
-    font-size: 2rem;
-    font-weight: bold;
+.stButton>button {
+    background:#dc2626;
+    color:white;
+    font-weight:600;
+    border-radius:8px;
+    height:3em;
+    width:100%;
+    border:none;
 }
-
-/* Fix markdown text */
-.stMarkdown, .stText {
-    color: #f1f5f9 !important;
-}
-
-/* Mobile improvements */
-@media (max-width: 768px) {
-    .metric-box h2 {
-        font-size: 1.8rem;
-    }
-    .result-card p {
-        font-size: 1rem;
-        color: #ffffff !important;
-    }
-}
-
+.stButton>button:hover { background:#b91c1c; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -111,8 +96,8 @@ h2, h3 {
 
 st.title("🛡️ AttackMe – AI Cyber Exposure Simulator")
 st.markdown("""
-**Enterprise-grade behavioral threat modeling simulation.**  
-This engine predicts your most probable compromise pathway based on digital behavior patterns.
+Enterprise-grade behavioral threat modeling simulation.  
+Predicting your most probable compromise pathway.
 """)
 
 st.divider()
@@ -174,21 +159,41 @@ if share_info == "Yes":
 if cracked_software == "Yes":
     score += risk_weights["cracked_software"]
 
-MAX_POSSIBLE_SCORE = sum(risk_weights.values())
-normalized_score = round((score / MAX_POSSIBLE_SCORE) * 100)
+MAX_SCORE = sum(risk_weights.values())
+normalized_score = round((score / MAX_SCORE) * 100)
 
 # =============================
-# RESPONSIVE LAYOUT SECTION
+# EXECUTIVE SUMMARY
 # =============================
 
-col_left, col_right = st.columns([3, 2])
+st.markdown("## 🧾 Executive Risk Overview")
+
+if normalized_score >= 75:
+    summary = "High probability of targeted compromise. Immediate mitigation required."
+    badge = "badge-high"
+elif normalized_score >= 50:
+    summary = "Multiple exploitable vectors detected. Risk reduction recommended."
+    badge = "badge-medium"
+else:
+    summary = "Moderate exposure. Strategic hardening advised."
+    badge = "badge-low"
+
+st.markdown(f"""
+<div class="exec-box">
+<h3>Exposure Score: {normalized_score}%</h3>
+<p>{summary}</p>
+<span class="badge {badge}">{summary.split('.')[0]}</span>
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
-# ATTACK PROBABILITY GRAPH
+# MAIN DASHBOARD
 # =============================
+
+col_left, col_right = st.columns([3,2])
 
 with col_left:
-    st.markdown("## 📈 Attack Vector Probability Model")
+    st.markdown("## 📈 Attack Probability Model")
 
     attack_vectors = {
         "Phishing": normalized_score * 0.9,
@@ -208,43 +213,30 @@ with col_left:
     ax.set_xticks(range(len(df)))
     ax.set_xticklabels(df["Attack Vector"], rotation=45)
     ax.set_ylabel("Probability (%)")
-
     st.pyplot(fig, use_container_width=True)
 
-# =============================
-# RISK DASHBOARD (RIGHT SIDE)
-# =============================
-
 with col_right:
-    st.markdown("## 📊 Behavioral Exposure Score")
-
+    st.markdown("## 📊 Exposure Dashboard")
     st.progress(normalized_score)
 
     st.markdown(f"""
     <div class="metric-box">
     <h2>{normalized_score}%</h2>
-    <p>Exposure Level</p>
+    <p>Behavioral Exposure</p>
     </div>
     """, unsafe_allow_html=True)
-
-    if normalized_score >= 75:
-        st.error("CRITICAL RISK – High probability of targeted compromise")
-    elif normalized_score >= 50:
-        st.warning("ELEVATED RISK – Multiple exploitable vectors detected")
-    else:
-        st.success("MODERATE / LOW RISK – Limited attack surface exposure")
 
 st.divider()
 
 # =============================
-# SIMULATION ENGINE
+# RUN SIMULATION
 # =============================
 
 if st.button("⚡ Run Threat Simulation"):
 
     st.session_state.risk_history.append(normalized_score)
 
-    summary = f"""
+    summary_input = f"""
     Password reuse: {reuse_passwords}
     Public social exposure: {public_social}
     MFA enabled: {two_fa}
@@ -254,21 +246,12 @@ if st.button("⚡ Run Threat Simulation"):
     Cracked software usage: {cracked_software}
     """
 
-    with st.spinner("Executing AI behavioral threat modeling..."):
+    with st.spinner("Executing AI threat modeling..."):
         try:
-            result = generate_attack_profile(summary)
-
-            if not result:
-                raise ValueError("Empty AI response")
-
+            result = generate_attack_profile(summary_input)
             data = json.loads(result)
-
-        except json.JSONDecodeError:
-            st.error("AI returned invalid JSON format.")
-            st.stop()
-
         except Exception as e:
-            st.error(f"Simulation failed: {str(e)}")
+            st.error(f"Simulation failed: {e}")
             st.stop()
 
     st.success("Threat Simulation Complete")
@@ -283,56 +266,41 @@ if st.button("⚡ Run Threat Simulation"):
         </div>
         """, unsafe_allow_html=True)
 
-    card("Initial Entry Vector", data.get("entry_point", "N/A"))
-    card("Reconnaissance Methodology", data.get("recon_method", "N/A"))
-    card("Exploitation Technique", data.get("exploitation_method", "N/A"))
-    card("Privilege Escalation Path", data.get("privilege_escalation", "N/A"))
-    card("Impact Assessment", data.get("impact", "N/A"))
+    card("Initial Entry Vector", data.get("entry_point","N/A"))
+    card("Reconnaissance Methodology", data.get("recon_method","N/A"))
+    card("Exploitation Technique", data.get("exploitation_method","N/A"))
+    card("Privilege Escalation", data.get("privilege_escalation","N/A"))
+    card("Impact Assessment", data.get("impact","N/A"))
 
-    st.markdown("## 🚨 AI Risk Classification")
+    # =============================
+    # RISK TREND CHART
+    # =============================
 
-    risk = data.get("risk_level", "medium").lower()
+    st.markdown("## 📊 Risk Trend Over Time")
 
-    if risk == "high":
-        st.error("AI Classification: HIGH RISK")
-    elif risk == "medium":
-        st.warning("AI Classification: MEDIUM RISK")
-    else:
-        st.success("AI Classification: LOW RISK")
+    trend_df = pd.DataFrame({
+        "Simulation": list(range(1, len(st.session_state.risk_history)+1)),
+        "Risk Score": st.session_state.risk_history
+    })
 
-    st.markdown("## 🛡 Recommended Security Controls")
+    fig2, ax2 = plt.subplots()
+    ax2.plot(trend_df["Simulation"], trend_df["Risk Score"])
+    ax2.set_xlabel("Simulation Run")
+    ax2.set_ylabel("Risk Score (%)")
+    st.pyplot(fig2, use_container_width=True)
 
-    mitigations = data.get("mitigation_actions") or []
-
-    if not isinstance(mitigations, list):
-        mitigations = []
-
-    for action in mitigations:
-        st.markdown(f"- {action}")
+    # =============================
+    # PDF REPORT
+    # =============================
 
     try:
         pdf_file = generate_pdf_report(normalized_score, data)
-
-        if pdf_file:
-            with open(pdf_file, "rb") as file:
-                st.download_button(
-                    label="📄 Download Full Security Report",
-                    data=file,
-                    file_name="AttackMe_Report.pdf",
-                    mime="application/pdf",
-                    key="download_report_button"
-                )
-        else:
-            st.error("PDF generation failed.")
-
-    except Exception:
-        st.error("Report generation failed.")
-
-    st.divider()
-
-    st.markdown("""
-    ### Executive Insight
-    Traditional security advice is generic.
-    AttackMe performs behavioral threat modeling to simulate realistic adversarial pathways.
-    Security begins with understanding your most probable breach vector.
-    """)
+        with open(pdf_file, "rb") as file:
+            st.download_button(
+                "📄 Download Full Security Report",
+                file,
+                "AttackMe_Report.pdf",
+                "application/pdf"
+            )
+    except:
+        st.error("PDF generation failed.")
