@@ -2,9 +2,6 @@
 
 AI-driven probabilistic cyber attack surface simulation engine.
 
-# live link
-https://attackme-ai-cyber-exposure-simulator-m4wjpje8gu2ytl4xbxeecg.streamlit.app/
-
 ## Features
 - Monte Carlo adversarial simulation
 - Multi-threat actor modeling
@@ -14,4 +11,4 @@ https://attackme-ai-cyber-exposure-simulator-m4wjpje8gu2ytl4xbxeecg.streamlit.ap
 - Intelligent mitigation recommendations
 
 ## Deployment
-Live app: (add Streamlit link after deploy)
+Live app:https://attackme-ai-cyber-exposure-simulator-m4wjpje8gu2ytl4xbxeecg.streamlit.app/
