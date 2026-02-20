@@ -262,7 +262,6 @@ if st.button("⚡ Run Threat Simulation"):
     st.markdown("## 🚨 AI Risk Classification")
 
     risk = data.get("risk_level", "medium").lower()
-
     if risk == "high":
         st.error("AI Classification: HIGH RISK")
     elif risk == "medium":
@@ -276,21 +275,20 @@ if st.button("⚡ Run Threat Simulation"):
 
     st.markdown("## 🛡 Recommended Security Controls")
 
-for action in data.get("mitigation_actions", []):
-    st.markdown(f"- {action}")
+    for action in data.get("mitigation_actions", []):
+        st.markdown(f"- {action}")
 
-# Generate PDF ONLY ONCE (outside loop)
-pdf_file = generate_pdf_report(normalized_score, data)
+    # Generate PDF ONLY ONCE
+    pdf_file = generate_pdf_report(normalized_score, data)
 
-with open(pdf_file, "rb") as file:
-    st.download_button(
-        label="📄 Download Full Security Report",
-        data=file,
-        file_name="AttackMe_Report.pdf",
-        mime="application/pdf",
-        key="download_report_button"
-    )
-
+    with open(pdf_file, "rb") as file:
+        st.download_button(
+            label="📄 Download Full Security Report",
+            data=file,
+            file_name="AttackMe_Report.pdf",
+            mime="application/pdf",
+            key="download_report_button"
+        )
 
     st.divider()
 
