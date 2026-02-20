@@ -1,48 +1,37 @@
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error
+from sklearn.linear_model import LogisticRegression
 import joblib
 
-# Step 1: Generate synthetic data
-data = []
+# Create synthetic training data
+np.random.seed(42)
 
-for _ in range(10000):
-    credential_reuse = np.random.uniform(0, 1)
-    phishing_risk = np.random.uniform(0, 1)
-    public_exposure = np.random.uniform(0, 1)
+data_size = 5000
 
-    # simulated ground truth risk
-    risk = (
-        0.4 * credential_reuse +
-        0.3 * phishing_risk +
-        0.3 * public_exposure
-    )
+credential_reuse = np.random.rand(data_size)
+phishing_risk = np.random.rand(data_size)
+public_exposure = np.random.rand(data_size)
 
-    data.append([
-        credential_reuse,
-        phishing_risk,
-        public_exposure,
-        risk
-    ])
+# Target risk score (weighted)
+risk = (
+    0.5 * credential_reuse +
+    0.3 * phishing_risk +
+    0.2 * public_exposure
+)
 
-df = pd.DataFrame(data, columns=[
-    "credential_reuse",
-    "phishing_risk",
-    "public_exposure",
-    "risk"
+risk = np.clip(risk, 0, 1)
+
+X = np.column_stack([
+    credential_reuse,
+    phishing_risk,
+    public_exposure
 ])
 
-X = df.drop("risk", axis=1)
-y = df["risk"]
+y = (risk > 0.5).astype(int)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-model = RandomForestRegressor()
-model.fit(X_train, y_train)
-
-preds = model.predict(X_test)
-print("MAE:", mean_absolute_error(y_test, preds))
+model = LogisticRegression()
+model.fit(X, y)
 
 joblib.dump(model, "risk_model.pkl")
+
+print("Model trained and saved successfully.")
