@@ -103,21 +103,21 @@ Predicting your most probable compromise pathway.
 st.divider()
 
 # =============================
-# INPUT SECTION
+# INPUT SECTION (WITH SELECT DEFAULT)
 # =============================
 
 col1, col2 = st.columns(2)
 
 with col1:
-    reuse_passwords = st.selectbox("Password Reuse Across Platforms", ["Yes", "No"])
-    public_social = st.selectbox("Public Social Media Presence", ["Yes", "No"])
-    two_fa = st.selectbox("Multi-Factor Authentication Enabled", ["Yes", "No"])
-    public_wifi = st.selectbox("Frequent Public WiFi Usage", ["Yes", "No"])
+    reuse_passwords = st.selectbox("Password Reuse Across Platforms", ["Select","Yes", "No"])
+    public_social = st.selectbox("Public Social Media Presence", ["Select","Yes", "No"])
+    two_fa = st.selectbox("Multi-Factor Authentication Enabled", ["Select","Yes", "No"])
+    public_wifi = st.selectbox("Frequent Public WiFi Usage", ["Select","Yes", "No"])
 
 with col2:
-    click_links = st.selectbox("Interaction with Unknown Links", ["Often", "Sometimes", "Never"])
-    share_info = st.selectbox("Sharing Personal Data Online", ["Yes", "No"])
-    cracked_software = st.selectbox("Installation of Unverified/Cracked Software", ["Yes", "No"])
+    click_links = st.selectbox("Interaction with Unknown Links", ["Select","Often", "Sometimes", "Never"])
+    share_info = st.selectbox("Sharing Personal Data Online", ["Select","Yes", "No"])
+    cracked_software = st.selectbox("Installation of Unverified/Cracked Software", ["Select","Yes", "No"])
 
 # =============================
 # SCORING ENGINE
@@ -160,7 +160,7 @@ if cracked_software == "Yes":
     score += risk_weights["cracked_software"]
 
 MAX_SCORE = sum(risk_weights.values())
-normalized_score = round((score / MAX_SCORE) * 100)
+normalized_score = round((score / MAX_SCORE) * 100) if MAX_SCORE else 0
 
 # =============================
 # EXECUTIVE SUMMARY
