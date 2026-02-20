@@ -96,7 +96,7 @@ h2 { color: #e5e7eb; font-weight:600; }
 
 st.title("🛡️ AttackMe – AI Cyber Exposure Simulator")
 st.markdown("""
-Enterprise-grade behavioral threat modeling simulation.  
+A behavioral threat modeling simulation.  
 Predicting your most probable compromise pathway.
 """)
 
