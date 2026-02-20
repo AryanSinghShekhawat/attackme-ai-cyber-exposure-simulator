@@ -28,64 +28,65 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-.stApp {
-    background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
-    color: #e5e7eb;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+/* Center container */
+.center-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 
-label, .stSelectbox label {
-    color: white !important;
-    font-weight: 500;
+/* BIG Responsive Button */
+div.stButton > button {
+    width: 80%;
+    max-width: 600px;
+    height: 80px;
+    font-size: 26px;
+    font-weight: bold;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    color: white;
+    border: none;
+    transition: 0.3s ease-in-out;
 }
 
-h1 { color: #f87171; font-weight:700; }
-h2 { color: #e5e7eb; font-weight:600; }
-
-.result-card {
-    background:#111827;
-    padding:20px;
-    border-radius:14px;
-    margin-bottom:15px;
-    border:1px solid #1f2937;
+div.stButton > button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #ff4b2b, #ff416c);
 }
 
-.exec-box {
-    background:linear-gradient(135deg,#111827,#1f2937);
-    padding:25px;
-    border-radius:16px;
-    border:1px solid #1f2937;
-    margin-bottom:25px;
+/* Fullscreen Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.badge {
-    display:inline-block;
-    padding:6px 14px;
-    border-radius:20px;
-    font-size:0.8rem;
-    font-weight:600;
-}
-.badge-low { background:rgba(34,197,94,0.15); color:#22c55e; }
-.badge-medium { background:rgba(234,179,8,0.15); color:#eab308; }
-.badge-high { background:rgba(239,68,68,0.15); color:#ef4444; }
-
-.metric-box {
-    background:#111827;
-    padding:20px;
-    border-radius:14px;
-    border:1px solid #1f2937;
-    text-align:center;
+/* Spinner Animation */
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #ff4b2b;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
 }
 
-.stButton>button {
-    background:#dc2626;
-    color:white;
-    font-weight:600;
-    border-radius:8px;
-    height:3em;
-    width:100%;
-    border:none;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -234,7 +235,33 @@ st.divider()
 # RUN SIMULATION
 # =============================
 
-if st.button("⚡ Run Threat Simulation"):
+# Centered Big Button
+st.markdown('<div class="center-button-container">', unsafe_allow_html=True)
+
+run_simulation = st.button("🚀 Run Threat Simulation")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+if run_simulation:
+    # Show loading overlay
+    loading_placeholder = st.empty()
+    loading_placeholder.markdown("""
+        <div class="loading-overlay">
+            <div class="loader"></div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Simulate processing (replace with your real function)
+    import time
+    time.sleep(3)
+
+    # Clear loading screen
+    loading_placeholder.empty()
+
+    # Now run your actual simulation logic here
+    # CALL YOUR EXISTING FUNCTION BELOW
+    # result = run_attack_simulation(...)
+    # st.write(result)
 
     st.session_state.risk_history.append(normalized_score)
 
