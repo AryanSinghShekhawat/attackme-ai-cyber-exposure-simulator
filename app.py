@@ -2,178 +2,231 @@ import streamlit as st
 import json
 from attack_engine import generate_attack_profile
 
+# =============================
+# PAGE CONFIG
+# =============================
 st.set_page_config(
-    page_title="AttackMe - AI Cyber Exposure Simulator",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    page_title="AttackMe | AI Cyber Exposure Simulator",
+    page_icon="🛡️",
+    layout="wide"
 )
 
-# ---------- Custom Cyber Theme ----------
+# =============================
+# PROFESSIONAL DARK THEME
+# =============================
 st.markdown("""
 <style>
 body {
-    background-color: #0b0f19;
-    color: #e6edf3;
+    background-color: #0f172a;
+    color: #e2e8f0;
 }
 .block-container {
     padding-top: 2rem;
 }
 h1 {
-    color: #ff4b4b;
+    color: #ef4444;
     font-weight: 800;
 }
 h2, h3 {
-    color: #ff6b6b;
+    color: #f87171;
 }
 .stButton>button {
-    background-color: #ff4b4b;
+    background: linear-gradient(90deg, #ef4444, #dc2626);
     color: white;
-    font-weight: bold;
-    border-radius: 10px;
+    font-weight: 600;
+    border-radius: 8px;
     height: 3em;
     width: 100%;
 }
-.stSelectbox label {
-    font-weight: 600;
-}
 .result-card {
-    background-color: #141a2a;
+    background-color: #1e293b;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 15px;
-    border: 1px solid #1f2937;
+    border: 1px solid #334155;
+}
+.metric-box {
+    background-color: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    text-align: center;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- Header ----------
-st.title("🚨 AttackMe – AI Cyber Exposure Simulator")
-st.markdown(
-    "Simulating your **most realistic digital compromise path** based on your behavior."
-)
-st.write("Answer honestly. See how you would actually be breached.")
+# =============================
+# HEADER
+# =============================
+st.title("🛡️ AttackMe – AI Cyber Exposure Simulator")
+st.markdown("""
+**Enterprise-grade behavioral threat modeling simulation.**  
+This engine predicts your most probable compromise pathway based on digital behavior patterns.
+""")
 
-st.markdown("---")
+st.divider()
 
-# ---------- Input Section ----------
+# =============================
+# INPUT SECTION
+# =============================
 col1, col2 = st.columns(2)
 
 with col1:
-    reuse_passwords = st.selectbox("Do you reuse passwords?", ["Yes", "No"])
-    public_social = st.selectbox("Are your social media profiles public?", ["Yes", "No"])
-    two_fa = st.selectbox("Do you use 2FA on all major accounts?", ["Yes", "No"])
-    public_wifi = st.selectbox("Do you use public WiFi frequently?", ["Yes", "No"])
+    reuse_passwords = st.selectbox("Password Reuse Across Platforms", ["Yes", "No"])
+    public_social = st.selectbox("Public Social Media Presence", ["Yes", "No"])
+    two_fa = st.selectbox("Multi-Factor Authentication Enabled", ["Yes", "No"])
+    public_wifi = st.selectbox("Frequent Public WiFi Usage", ["Yes", "No"])
 
 with col2:
-    click_links = st.selectbox("Do you click unknown links?", ["Often", "Sometimes", "Never"])
-    share_info = st.selectbox("Do you share personal info online?", ["Yes", "No"])
-    cracked_software = st.selectbox("Do you install cracked software?", ["Yes", "No"])
+    click_links = st.selectbox("Interaction with Unknown Links", ["Often", "Sometimes", "Never"])
+    share_info = st.selectbox("Sharing Personal Data Online", ["Yes", "No"])
+    cracked_software = st.selectbox("Installation of Unverified/Cracked Software", ["Yes", "No"])
 
-# ---------- Risk Score ----------
+# =============================
+# SCORING ENGINE (Structured & Normalized)
+# =============================
+
+risk_weights = {
+    "reuse_passwords": 20,
+    "public_social": 15,
+    "two_fa": 25,
+    "public_wifi": 10,
+    "click_links_often": 15,
+    "click_links_sometimes": 8,
+    "share_info": 10,
+    "cracked_software": 20
+}
+
 score = 0
 
 if reuse_passwords == "Yes":
-    score += 20
+    score += risk_weights["reuse_passwords"]
+
 if public_social == "Yes":
-    score += 15
+    score += risk_weights["public_social"]
+
 if two_fa == "No":
-    score += 25
+    score += risk_weights["two_fa"]
+
 if public_wifi == "Yes":
-    score += 10
+    score += risk_weights["public_wifi"]
+
 if click_links == "Often":
-    score += 15
+    score += risk_weights["click_links_often"]
+elif click_links == "Sometimes":
+    score += risk_weights["click_links_sometimes"]
+
 if share_info == "Yes":
-    score += 10
+    score += risk_weights["share_info"]
+
 if cracked_software == "Yes":
-    score += 20
+    score += risk_weights["cracked_software"]
 
-st.markdown("### 🔎 Behavioral Exposure Score")
-st.progress(score / 100)
-st.write(f"Estimated Exposure Level: **{score}%**")
+# Normalize score to 0–100 scale
+MAX_POSSIBLE_SCORE = sum(risk_weights.values())
+normalized_score = round((score / MAX_POSSIBLE_SCORE) * 100)
 
-st.markdown("---")
+# =============================
+# RISK DASHBOARD
+# =============================
 
-# ---------- Simulation Button ----------
-if st.button("⚡ Simulate My Attack Path"):
+st.markdown("## 📊 Behavioral Exposure Score")
+
+colA, colB = st.columns([2, 1])
+
+with colA:
+    st.progress(normalized_score)
+
+with colB:
+    st.markdown(f"""
+    <div class="metric-box">
+    <h2>{normalized_score}%</h2>
+    <p>Exposure Level</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Risk Category Logic
+if normalized_score >= 75:
+    st.error("CRITICAL RISK – High probability of targeted compromise")
+elif normalized_score >= 50:
+    st.warning("ELEVATED RISK – Multiple exploitable vectors detected")
+else:
+    st.success("MODERATE / LOW RISK – Limited attack surface exposure")
+
+st.divider()
+
+# =============================
+# SIMULATION ENGINE
+# =============================
+
+if st.button("⚡ Run Threat Simulation"):
 
     summary = f"""
     Password reuse: {reuse_passwords}
     Public social exposure: {public_social}
-    2FA usage: {two_fa}
-    Public WiFi: {public_wifi}
-    Clicking unknown links: {click_links}
+    MFA enabled: {two_fa}
+    Public WiFi usage: {public_wifi}
+    Unknown link interaction: {click_links}
     Sharing personal info: {share_info}
     Cracked software usage: {cracked_software}
     """
 
-    with st.spinner("Running behavioral compromise simulation..."):
-        result = generate_attack_profile(summary)
+    with st.spinner("Executing AI behavioral threat modeling..."):
+        try:
+            result = generate_attack_profile(summary)
+            data = json.loads(result)
 
-    data = json.loads(result)
+        except Exception as e:
+            st.error("Simulation failed. Please verify backend configuration.")
+            st.stop()
 
-    st.success("Simulation Complete")
+    st.success("Threat Simulation Complete")
 
-    st.markdown("## 🎯 Your Personalized Attack Path")
+    st.markdown("## 🎯 Predicted Compromise Pathway")
 
-    # Cards layout
-    st.markdown(f"""
-    <div class="result-card">
-    <h3>Entry Point</h3>
-    {data["entry_point"]}
-    </div>
-    """, unsafe_allow_html=True)
+    def card(title, content):
+        st.markdown(f"""
+        <div class="result-card">
+        <h3>{title}</h3>
+        <p>{content}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div class="result-card">
-    <h3>Recon Method</h3>
-    {data["recon_method"]}
-    </div>
-    """, unsafe_allow_html=True)
+    card("Initial Entry Vector", data.get("entry_point", "N/A"))
+    card("Reconnaissance Methodology", data.get("recon_method", "N/A"))
+    card("Exploitation Technique", data.get("exploitation_method", "N/A"))
+    card("Privilege Escalation Path", data.get("privilege_escalation", "N/A"))
+    card("Impact Assessment", data.get("impact", "N/A"))
 
-    st.markdown(f"""
-    <div class="result-card">
-    <h3>Exploitation Method</h3>
-    {data["exploitation_method"]}
-    </div>
-    """, unsafe_allow_html=True)
+    # =============================
+    # RISK LEVEL FROM AI
+    # =============================
 
-    st.markdown(f"""
-    <div class="result-card">
-    <h3>Privilege Escalation</h3>
-    {data["privilege_escalation"]}
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("## 🚨 AI Risk Classification")
 
-    st.markdown(f"""
-    <div class="result-card">
-    <h3>Impact</h3>
-    {data["impact"]}
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ---------- Risk Level ----------
-    risk = data["risk_level"].lower()
-
-    st.markdown("## 🚨 Risk Assessment")
+    risk = data.get("risk_level", "medium").lower()
 
     if risk == "high":
-        st.error("⚠ HIGH RISK – Immediate mitigation recommended")
+        st.error("AI Classification: HIGH RISK")
     elif risk == "medium":
-        st.warning("⚠ MEDIUM RISK – Significant exposure detected")
+        st.warning("AI Classification: MEDIUM RISK")
     else:
-        st.success("LOW RISK – Good security posture")
+        st.success("AI Classification: LOW RISK")
 
-    # ---------- Mitigation ----------
-    st.markdown("## 🛡 Recommended Mitigation Actions")
+    # =============================
+    # MITIGATION
+    # =============================
 
-    for action in data["mitigation_actions"]:
+    st.markdown("## 🛡 Recommended Security Controls")
+
+    for action in data.get("mitigation_actions", []):
         st.markdown(f"- {action}")
 
-    st.markdown("---")
+    st.divider()
 
     st.markdown("""
-    ### Why This Matters
-    Most cybersecurity tools give generic advice.
-    AttackMe models how **you specifically** would be compromised.
-    Prevention starts with realistic threat simulation.
+    ### Executive Insight
+    Traditional security advice is generic.
+    AttackMe performs behavioral threat modeling to simulate **realistic adversarial pathways**.
+    Security begins with understanding your most probable breach vector.
     """)
