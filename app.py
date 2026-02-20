@@ -276,7 +276,7 @@ if st.button("⚡ Run Threat Simulation"):
 
     st.markdown("## 🛡 Recommended Security Controls")
 
-    for action in data.get("mitigation_actions", []):
+for action in data.get("mitigation_actions", []):
     st.markdown(f"- {action}")
 
 # Generate PDF ONLY ONCE (outside loop)
