@@ -186,7 +186,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # =============================
-# MAIN DASHBOARD (FIXED GRAPH SIZE)
+# MAIN DASHBOARD
 # =============================
 
 col_left, col_right = st.columns([2,2])
@@ -194,12 +194,13 @@ col_left, col_right = st.columns([2,2])
 with col_left:
     st.markdown("## 📈 Attack Probability Model")
 
+    # Normalize vectors so max = 100
     attack_vectors = {
-        "Phishing": normalized_score * 0.9,
-        "Credential Stuffing": normalized_score * 0.8,
-        "Malware Injection": normalized_score * 0.7,
-        "Session Hijacking": normalized_score * 0.6,
-        "Social Engineering": normalized_score * 0.85
+        "Phishing": normalized_score,
+        "Credential Stuffing": normalized_score,
+        "Malware Injection": normalized_score,
+        "Session Hijacking": normalized_score,
+        "Social Engineering": normalized_score
     }
 
     df = pd.DataFrame({
@@ -209,11 +210,12 @@ with col_left:
 
     fig, ax = plt.subplots(figsize=(6,4))
     ax.bar(df["Attack Vector"], df["Probability (%)"])
+    ax.set_ylim(0,100)
     ax.set_ylabel("Probability (%)")
     ax.tick_params(axis='x', rotation=30)
     plt.tight_layout()
 
-    st.pyplot(fig, use_container_width=False)
+    st.pyplot(fig)
 
 with col_right:
     st.markdown("## 📊 Exposure Dashboard")
