@@ -1,11 +1,12 @@
 import streamlit as st
+import joblib
 import matplotlib.pyplot as plt
-
 from core.profile_builder import build_profile
 from core.attack_graph import generate_attack_paths
 from core.monte_carlo import run_simulation
 from core.threat_actor import THREAT_ACTORS
 
+model = joblib.load("risk_model.pkl")
 
 st.set_page_config(page_title="AttackMe AI", layout="wide")
 
@@ -76,6 +77,18 @@ if run_clicked:
     # Apply MFA simulation
     if enable_mfa and "credential_reuse" in profile:
         profile["credential_reuse"] *= 0.6
+
+    # ML Prediction
+    features = [[
+        profile["credential_reuse"],
+        profile.get("phishing_risk", 0),
+        profile.get("public_exposure", 0)
+    ]]
+
+    predicted_risk = model.predict(features)[0]
+
+    st.subheader("🤖 AI Model Risk Prediction")
+    st.write(f"Predicted Risk Score (ML): {predicted_risk:.2f}")
 
     # Generate attack paths
     paths = generate_attack_paths(profile)
