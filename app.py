@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 # =============================
-# SERIES A ENTERPRISE UI
+# ENTERPRISE UI STYLE
 # =============================
 
 st.markdown("""
@@ -187,10 +187,10 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # =============================
-# MAIN DASHBOARD
+# MAIN DASHBOARD (FIXED GRAPH SIZE)
 # =============================
 
-col_left, col_right = st.columns([3,2])
+col_left, col_right = st.columns([2,2])
 
 with col_left:
     st.markdown("## 📈 Attack Probability Model")
@@ -208,15 +208,13 @@ with col_left:
         "Probability (%)": list(attack_vectors.values())
     })
 
-    fig, ax = plt.subplots(figsize=(6,4))   # 🔥 Smaller size
-
+    fig, ax = plt.subplots(figsize=(6,4))
     ax.bar(df["Attack Vector"], df["Probability (%)"])
     ax.set_ylabel("Probability (%)")
-    ax.set_xticklabels(df["Attack Vector"], rotation=30)
-
+    ax.tick_params(axis='x', rotation=30)
     plt.tight_layout()
 
-    st.pyplot(fig, use_container_width=False)   # 🔥 Prevent full screen
+    st.pyplot(fig, use_container_width=False)
 
 with col_right:
     st.markdown("## 📊 Exposure Dashboard")
@@ -276,6 +274,24 @@ if st.button("⚡ Run Threat Simulation"):
     card("Impact Assessment", data.get("impact","N/A"))
 
     # =============================
+    # MITIGATION SECTION (ADDED)
+    # =============================
+
+    st.markdown("## 🛡 Recommended Security Controls")
+
+    mitigations = data.get("mitigation_actions") or []
+
+    if isinstance(mitigations, list) and mitigations:
+        for action in mitigations:
+            st.markdown(f"""
+            <div class="result-card">
+                {action}
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("No mitigation data returned from AI.")
+
+    # =============================
     # RISK TREND CHART
     # =============================
 
@@ -286,11 +302,13 @@ if st.button("⚡ Run Threat Simulation"):
         "Risk Score": st.session_state.risk_history
     })
 
-    fig2, ax2 = plt.subplots()
+    fig2, ax2 = plt.subplots(figsize=(6,4))
     ax2.plot(trend_df["Simulation"], trend_df["Risk Score"])
     ax2.set_xlabel("Simulation Run")
     ax2.set_ylabel("Risk Score (%)")
-    st.pyplot(fig2, use_container_width=True)
+    plt.tight_layout()
+
+    st.pyplot(fig2, use_container_width=False)
 
     # =============================
     # PDF REPORT
