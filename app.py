@@ -23,7 +23,7 @@ st.set_page_config(
 )
 
 # =============================
-# ENTERPRISE UI STYLE
+# ENTERPRISE UI STYLE (FIXED LABEL COLOR)
 # =============================
 
 st.markdown("""
@@ -32,6 +32,11 @@ st.markdown("""
     background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
     color: #e5e7eb;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+label, .stSelectbox label {
+    color: white !important;
+    font-weight: 500;
 }
 
 h1 { color: #f87171; font-weight:700; }
@@ -43,11 +48,6 @@ h2 { color: #e5e7eb; font-weight:600; }
     border-radius:14px;
     margin-bottom:15px;
     border:1px solid #1f2937;
-    transition:0.3s ease;
-}
-.result-card:hover {
-    transform:translateY(-4px);
-    border-color:#374151;
 }
 
 .exec-box {
@@ -86,7 +86,6 @@ h2 { color: #e5e7eb; font-weight:600; }
     width:100%;
     border:none;
 }
-.stButton>button:hover { background:#b91c1c; }
 </style>
 """, unsafe_allow_html=True)
 
