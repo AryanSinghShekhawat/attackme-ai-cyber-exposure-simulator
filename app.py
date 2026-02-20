@@ -1,6 +1,7 @@
 import streamlit as st
 import joblib
 import matplotlib.pyplot as plt
+from ai_analyst import generate_ai_analysis
 from core.profile_builder import build_profile
 from core.attack_graph import generate_attack_paths
 from core.monte_carlo import run_simulation
@@ -166,6 +167,15 @@ if run_clicked:
         st.info("Moderate mitigation impact detected.")
     else:
         st.warning("Limited mitigation impact. Advanced controls recommended.")
+    
+    ai_summary = generate_ai_analysis(
+    username,
+    actor_results,
+    most_dangerous,
+    improvement_percent / 100
+    )
+    st.subheader("AI Security Analyst Report")
+    st.info(ai_summary)
 
     # -------------------------
     # Risk Distribution Graph
