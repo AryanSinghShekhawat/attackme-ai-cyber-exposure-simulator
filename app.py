@@ -278,15 +278,13 @@ if st.button("⚡ Run Threat Simulation"):
 
     for action in data.get("mitigation_actions", []):
         st.markdown(f"- {action}")
-        # Generate PDF
-pdf_file = generate_pdf_report(normalized_score, data)
-
-with open(pdf_file, "rb") as file:
-    st.download_button(
-        label="📄 Download Full Security Report",
-        data=file,
-        file_name="AttackMe_Report.pdf",
-        mime="application/pdf"
+        pdf_file = generate_pdf_report(normalized_score, data)
+        with open(pdf_file, "rb") as file:
+            st.download_button(
+                label="📄 Download Full Security Report",
+                data=file,
+                file_name="AttackMe_Report.pdf",
+                mime="application/pdf"
     )
 
     st.divider()
