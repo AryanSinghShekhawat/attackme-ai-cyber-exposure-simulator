@@ -1,6 +1,8 @@
 import streamlit as st
 import joblib
 import matplotlib.pyplot as plt
+import base64
+
 from ai_analyst import generate_ai_analysis
 from core.profile_builder import build_profile
 from core.attack_graph import generate_attack_paths
@@ -10,6 +12,35 @@ from core.threat_actor import THREAT_ACTORS
 model = joblib.load("risk_model.pkl")
 
 st.set_page_config(page_title="AttackMe AI", layout="wide")
+
+# -------------------------
+# BACKGROUND IMAGE
+# -------------------------
+def set_background(image_file):
+    with open(image_file, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/jpg;base64,{encoded}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: scroll;
+        }}
+
+        .block-container {{
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 2rem;
+            border-radius: 12px;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+set_background("assets/background.jpg")
 
 st.title("AttackMe AI – Adaptive Cyber Exposure Emulator")
 
