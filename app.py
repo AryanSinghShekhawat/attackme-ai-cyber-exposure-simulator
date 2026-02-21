@@ -31,14 +31,20 @@ def set_background(image_file):
             background-attachment: fixed;
         }}
 
-        /* Dark overlay for readability */
+        /* Main content container */
         .block-container {{
-            background-color: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.65);
             padding: 2rem;
-            border-radius: 15px;
+            border-radius: 16px;
         }}
 
-        /* Input readability fix */
+        /* FORCE TEXT TO BE FULL WHITE */
+        h1, h2, h3, h4, h5, h6, p, label, span, div {{
+            color: white !important;
+            opacity: 1 !important;
+        }}
+
+        /* Input fields */
         div[data-baseweb="input"] > div {{
             background-color: rgba(255, 255, 255, 0.95) !important;
             border-radius: 10px;
@@ -49,7 +55,7 @@ def set_background(image_file):
             font-weight: 600;
         }}
 
-        /* Button styling */
+        /* Button */
         .stButton>button {{
             background-color: #ff4b4b;
             color: white;
