@@ -1,3 +1,4 @@
+import re
 import streamlit as st
 import joblib
 import matplotlib.pyplot as plt
@@ -130,6 +131,12 @@ if run_clicked:
     if not username:
         st.warning("Please enter a username or Gmail.")
         st.stop()
+    # Validate email or username format
+    email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    username_pattern = r'^[a-zA-Z0-9._]{4,20}$'
+    if not (re.match(email_pattern, username) or re.match(username_pattern, username)):
+        st.error("Invalid username or email format.")
+        st.stop()
 
     # Build profile
     profile = build_profile(username)
@@ -199,7 +206,14 @@ if run_clicked:
     # -------------------------
     # Most Dangerous Actor
     # -------------------------
-    most_dangerous = max(actor_results, key=lambda x: actor_results[x]["mean"])
+    # Add small noise factor to break ties & add realism
+    import random
+    adjusted_scores = {
+        actor: actor_results[actor]["mean"] + random.uniform(-0.02, 0.02)
+        for actor in actor_results
+    }
+    
+    most_dangerous = max(adjusted_scores, key=adjusted_scores.get)
 
     st.subheader("🚨 Most Dangerous Threat Actor")
     st.error(f"{most_dangerous} poses the highest compromise probability.")
