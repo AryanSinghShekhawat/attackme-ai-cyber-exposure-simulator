@@ -30,11 +30,25 @@ def set_background(image_file):
             background-attachment: scroll;
         }}
 
+        /* Dark overlay with blur for readability */
         .block-container {{
-            background-color: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
             padding: 2rem;
-            border-radius: 12px;
+            border-radius: 16px;
         }}
+
+        /* Force text color to white */
+        h1, h2, h3, h4, h5, h6, p, label, div {{
+            color: white !important;
+        }}
+
+        /* Improve input field contrast */
+        input, textarea {{
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }}
+
         </style>
         """,
         unsafe_allow_html=True
