@@ -23,30 +23,38 @@ def set_background(image_file):
     st.markdown(
         f"""
         <style>
+
         .stApp {{
             background-image: url("data:image/jpg;base64,{encoded}");
             background-size: cover;
             background-position: center;
-            background-attachment: scroll;
+            background-attachment: fixed;
         }}
 
-        /* Dark overlay with blur for readability */
+        /* Dark overlay for readability */
         .block-container {{
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(6px);
+            background-color: rgba(0, 0, 0, 0.75);
             padding: 2rem;
-            border-radius: 16px;
+            border-radius: 15px;
         }}
 
-        /* Force text color to white */
-        h1, h2, h3, h4, h5, h6, p, label, div {{
-            color: white !important;
+        /* Input readability fix */
+        div[data-baseweb="input"] > div {{
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-radius: 10px;
         }}
 
-        /* Improve input field contrast */
-        input, textarea {{
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
+        input {{
+            color: black !important;
+            font-weight: 600;
+        }}
+
+        /* Button styling */
+        .stButton>button {{
+            background-color: #ff4b4b;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
         }}
 
         </style>
